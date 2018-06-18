@@ -43,6 +43,8 @@ import net.iGap.module.enums.ConnectionState;
 import net.iGap.proto.ProtoClientCondition;
 import net.iGap.request.RequestWrapper;
 
+import org.paygear.wallet.utils.Utils;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,6 +57,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import cat.ereza.customactivityoncrash.config.CaocConfig;
 import io.fabric.sdk.android.Fabric;
+import ir.radsense.raadcore.Raad;
+import ir.radsense.raadcore.web.WebBase;
 
 import static net.iGap.Config.DEFAULT_BOTH_CHAT_DELETE_TIME;
 
@@ -373,6 +377,10 @@ public class G extends MultiDexApplication {
         context = getApplicationContext();
         handler = new Handler();
         inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        Raad.init(getApplicationContext());
+        Utils.setLocale(context, "fa");
+        WebBase.apiKey = "5aa7e856ae7fbc00016ac5a01c65909797d94a16a279f46a4abb5faa";
 
         new StartupActions();
     }
