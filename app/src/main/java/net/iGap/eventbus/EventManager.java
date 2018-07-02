@@ -37,6 +37,8 @@ public class EventManager {
 
 
     public static final int ON_ACCESS_TOKEN_RECIVE = 1;
+    public static final int ON_INIT_PAY = 2;
+    public static final int ON_PAYMENT_RESULT_RECIEVED=3;
 
 
 

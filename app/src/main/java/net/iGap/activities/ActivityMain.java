@@ -47,6 +47,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -143,6 +144,7 @@ import net.iGap.viewmodel.FragmentSettingViewModel;
 
 import org.paygear.wallet.WalletActivity;
 import org.paygear.wallet.model.Card;
+import org.paygear.wallet.model.PaymentResult;
 import org.paygear.wallet.web.Web;
 
 import java.io.File;
@@ -151,6 +153,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
+import ir.radsense.raadcore.model.Auth;
 import ir.radsense.raadcore.web.WebBase;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -2027,25 +2030,25 @@ public class ActivityMain extends ActivityEnhanced implements OnUserInfoMyClient
 
     public void getUserCredit() {
         WebBase.apiKey = "5aa7e856ae7fbc00016ac5a01c65909797d94a16a279f46a4abb5faa";
-        Web.getInstance().getWebService().getCards(null, false).enqueue(new Callback<ArrayList<Card>>() {
+        Web.getInstance().getWebService().getCredit(Auth.getCurrentAuth().getId()).enqueue(new Callback<ArrayList<Card>>() {
             @Override
             public void onResponse(Call<ArrayList<Card>> call, Response<ArrayList<Card>> response) {
                 if (response.body() != null) {
                     Card selectedCard = null;
-                    for (Card item : response.body()) {
-                        if (item.type == 1)
-                            selectedCard = item;
-
-                    }
+                    if (response.body().size() > 0)
+                        selectedCard=response.body().get(0);
                     if (selectedCard != null) {
                         txtNavwalletCredit.setVisibility(View.VISIBLE);
-                        txtNavwalletCredit.setText("اعتبار شما : " + String.valueOf(selectedCard.balance) + " ریال ");
+                        txtNavwalletCredit.setText("اعتبار شما : " + String.valueOf(selectedCard.cashOutBalance) + " ریال ");
                         txtNavwalletCredit.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 Intent intent = new Intent(ActivityMain.this, WalletActivity.class);
                                 intent.putExtra("Language", "fa");
                                 intent.putExtra("Mobile", "0" + phoneNumber.substring(2));
+                                intent.putExtra("PrimaryColor", "#f69228");
+                                intent.putExtra("DarkPrimaryColor", "#f99228");
+                                intent.putExtra("AccentColor","#cdcbcb");
                                 startActivity(intent);
                             }
                         });
@@ -2738,4 +2741,24 @@ public class ActivityMain extends ActivityEnhanced implements OnUserInfoMyClient
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 66) {
+            if (resultCode == RESULT_OK) {
+                PaymentResult paymentResult = (PaymentResult) data.getSerializableExtra("result");
+                if (paymentResult != null) {
+                    Toast.makeText(this, "trace number:" + String.valueOf(paymentResult.traceNumber) + "amount :" + String.valueOf(paymentResult.amount), Toast.LENGTH_SHORT).show();
+                    EventManager.getInstance().postEvent(EventManager.ON_PAYMENT_RESULT_RECIEVED, socketMessages.PaymentResultRecievedSuccess);
+                }else {
+                    Toast.makeText(this, "ناموفق", Toast.LENGTH_SHORT).show();
+                    EventManager.getInstance().postEvent(EventManager.ON_PAYMENT_RESULT_RECIEVED, socketMessages.PaymentResultRecievedFailed);
+
+                }
+            }else {
+                Toast.makeText(this, "payment is canceled", Toast.LENGTH_SHORT).show();
+                EventManager.getInstance().postEvent(EventManager.ON_PAYMENT_RESULT_RECIEVED, socketMessages.PaymentResultNotRecieved);
+            }
+        }
+    }
 }

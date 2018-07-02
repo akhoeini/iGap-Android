@@ -243,6 +243,7 @@ public class HelperFillLookUpClass {
 
         //Wallet 90xx
         lookupMap.put(39000, "ProtoWalletGetAccessToken.WalletGetAccessTokenResponse");
+        lookupMap.put(39001, "ProtoWalletPaymentInit.WalletPaymentInitResponse");
 
     }
 

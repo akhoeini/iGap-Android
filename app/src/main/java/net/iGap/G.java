@@ -357,6 +357,8 @@ public class G extends MultiDexApplication {
     public static boolean multiTab = false;
     public static boolean isTimeWhole = false;
     public static FragmentManager fragmentManager;
+    public static ActivityMain onWalletGetAccessToken;
+    public static boolean isWalletActive=false;
     private Tracker mTracker;
 
 
@@ -369,7 +371,7 @@ public class G extends MultiDexApplication {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Fabric.with(getApplicationContext(), new Crashlytics.Builder().core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build()).build());
+                Fabric.with(getApplicationContext(), new Crashlytics.Builder().core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build()).build(), new Crashlytics());
                 CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).showErrorDetails(false).showRestartButton(true).trackActivities(true).restartActivity(ActivityMain.class).errorActivity(ActivityCustomError.class).apply();
             }
         }).start();
@@ -418,6 +420,7 @@ public class G extends MultiDexApplication {
         G.context = baseContext;
 
         return baseContext;
+
     }
 
     @Override
